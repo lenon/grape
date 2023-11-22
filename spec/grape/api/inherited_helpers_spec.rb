@@ -44,6 +44,10 @@ describe Grape::API::Helpers do
         "#{current_user}: #{params['id']}"
       end
     end
+
+    class MountedSubClass < Grape::API
+      mount SubClass
+    end
   end
 
   context 'non overriding subclass' do
@@ -109,6 +113,19 @@ describe Grape::API::Helpers do
         get '/resource'
         expect(last_response.body).to eq('id is missing')
       end
+    end
+  end
+
+  context 'mounted subclass' do
+    subject { InheritedHelpersSpec::MountedSubClass }
+
+    def app
+      subject
+    end
+
+    it 'inherits helpers from a superclass' do
+      get '/resource', id: id, user: user
+      expect(last_response.body).to eq("#{user}: #{id}")
     end
   end
 end
